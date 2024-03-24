@@ -1,0 +1,10 @@
+srcroot  : ./0_1015/
+dstroot  : ./test_identification_frames/
+device   : cuda:1
+batchsize: 18
+bufsize  : 10 # Number of batches to be stored at once.
+license_plate_model:
+  modelpath      : ./models/license_plate_seg.pt
+  threshold : 0.05
+  reference : https://github.com/dbpprt/pytorch-licenseplate-segmentation
+yolo_nas : yolo_nas_l
