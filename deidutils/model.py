@@ -61,7 +61,7 @@ class License_Plate_Segmentor(Based_De_Identificator):
             )
             model.classifier = DeepLabHead(2048, outputchannels)
             return model
-        
+        print(modelpath)
         model = model_arch()
         model.load_state_dict(torch.load(modelpath, map_location='cpu')['model'])
 
