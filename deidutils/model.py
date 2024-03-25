@@ -1,4 +1,6 @@
 import os
+import cv2
+import numpy as np
 import torch
 from torchvision import models
 from torchvision.models.segmentation.deeplabv3 import DeepLabHead, DeepLabV3_ResNet101_Weights, DeepLabV3
@@ -104,7 +106,7 @@ class YOLO_Human_Detector(Based_De_Identificator):
         def _make_mask(ri) -> torch.Tensor:
             
             bbox, mask_size = self._extract_info(r=ri)
-              
+
             return _aggreage_mask(
                 crop_mask(
                     masks = torch.ones(
@@ -113,7 +115,7 @@ class YOLO_Human_Detector(Based_De_Identificator):
                     boxes = bbox
                 )
             )
-        
+        #cv2.imwrite("vis_mask.jpg",(m[0].permute(1,2,0).cpu().numpy()*255).astype(np.uint8))
         return torch.stack([_make_mask(ri=ri) for ri in r])
 
 class YOLO_NAS_Human_Detector(YOLO_Human_Detector):
@@ -136,6 +138,7 @@ class YOLO_NAS_Human_Detector(YOLO_Human_Detector):
         privacy_idices = self.privacy_issue_obj(
             torch.tensor(r.prediction.labels, dtype=torch.long)
         )
+        # _ = input(privacy_idices)
 
         mask_size = (privacy_idices.size()[0], r.image.shape[0], r.image.shape[1])
 
