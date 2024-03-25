@@ -84,16 +84,16 @@ class YOLO_Human_Detector(Based_De_Identificator):
     def privacy_issue_obj(self, class_reuslt:torch.Tensor):
         
         idx = (class_reuslt == self.privacy_issue_class_label [0])
-        for i in self.privacy_issue_class_label [1:]:
-                idx = idx | (idx == i)
+        for i in self.privacy_issue_class_label[1:]:
+                idx = idx | (class_reuslt == i)
                 
         return torch.squeeze(torch.nonzero(idx), dim = 1)
             
     def _extract_info(self, r)->tuple[torch.Tensor, tuple]:
-        _ = input(r.boxes.orig_shape)
+
         privacy_idices = self.privacy_issue_obj(r.boxes.cls.to(dtype=torch.long))
         mask_size = (privacy_idices.size()[0],  r.boxes.orig_shape[0],  r.boxes.orig_shape[1])
-        _ = input(r.boxes.xyxy.dtype)
+        
         return r.boxes.xyxy[privacy_idices], mask_size
             
     def post_processing(self, r:list, **kwargs) -> torch.Tensor:
@@ -126,8 +126,11 @@ class YOLO_NAS_Human_Detector(YOLO_Human_Detector):
         return sgmodel.get(yolonas_type, pretrained_weights="coco")
     
     def forward(self, batch, **kwargs):
-        return self.model.predict(batch)._images_prediction_lst
-
+        if len(batch) > 1:
+            return self.model.predict(batch)._images_prediction_lst
+        else:
+            return [self.model.predict(batch)]
+        
     def _extract_info(self, r)->tuple[torch.Tensor, tuple]:
         
         privacy_idices = self.privacy_issue_obj(
